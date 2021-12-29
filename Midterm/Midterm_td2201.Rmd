@@ -1,6 +1,6 @@
 ---
 title: "Midterm"
-author: "Manpreet S. Katari"
+author: "Tanubrata Dey"
 date: "10/24/2021"
 output: html_document
 ---
