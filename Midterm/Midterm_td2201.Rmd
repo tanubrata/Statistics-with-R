@@ -1,0 +1,384 @@
+---
+title: "Midterm"
+author: "Manpreet S. Katari"
+date: "10/24/2021"
+output: html_document
+---
+
+
+### Tanubrata Dey (td2201)
+#### Midterm
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Statistics in Biology Midterm
+
+Please answer the following questions in the space provided. This is an open book exam and so the textbook, lecture notes and your notes are allowed. Access to a computer with R is allowed.
+
+Show your working for each question, including showing the major steps in R R code is however where required.
+
+## 1) Define the following terms (15 pts).
+
+### a) Define the sampling distribution of a statistic.
+
+The sampling distribution of a statistic is a probability distribution of a statistic obtained from a large number of samples that has been drawn from a specific population. It is considered as a random variable, when derived from a random sample of size n.
+
+```{r eval=FALSE}
+The sampling distribution of a statistic is a probability distribution of a statistic obtained from a large number of samples that has been drawn from a specific population. It is considered as a random variable, when derived from a random sample of size n.
+```
+
+
+### b) Define the standard error of a statistic.
+
+The standard error of a statistic is the approximate standard deviation of sampling distribution or population. It basically measures the accuracy with which a sample distribution represents a population by using standard deviation.
+
+```{r eval=FALSE}
+The standard error of a statistic is the approximate standard deviation of sampling distribution or population. It basically measures the accuracy with which a sample distribution represents a population by using standard deviation.
+```
+
+
+### c) Define "p-value" in terms of conditional probabilities.
+
+In terms of conditional probabilities, p-value is the probability of obtaining the observed data or more extreme data given that the null hypothesis is true.
+
+
+```{r eval=FALSE}
+In terms of conditional probabilities, p-value is the probability of obtaining the observed data or more extreme data given that the null hypothesis is true.
+```
+
+## 2) If the normally distributed population of human body weights has a mean of 73.0 kg and a standard deviation of 12.0 kg (10 pts)
+
+### a) What proportion of this population is 78.0 kg or larger?
+
+We know that if we use pnorm to get P(X>x), we can use the pnorm function by just specifying that we need the upper tail which would usually give proportion for population that larger than 78kg. Since it is 78kg or larger, so basically we can just use 78 because it is too small for x = 78 to even matter.
+
+```{r}
+pnorm(78, mean = 73, sd = 12, lower.tail = FALSE) 
+```
+33.8% of the population is 78kg or larger.
+
+### b) What proportion of this population is less than 78.0 kg?
+
+We know that if we use pnorm to get P(V<=x), we can use the pnorm function by just specifying that we need the lower tail which would usually give proportion for population less than equal to 78kg. 
+
+```{r}
+pnorm(78, mean = 73, sd = 12)
+```
+66.1% of the population is less than 78kg. Though it includes 78kg in our data, but still its very small to consider.
+
+## 3) In a clinic, a sample of patients with cystic fibrosis are studied. Researchers were able to measure the weights of 9 patients from this subpopulation. The mean of their sample was 56.6 kilograms with a standard deviation of 14.5 kilograms. (10 pts).
+
+### a) Test the null hypothesis that the mean weight of this sample of patients is equal to the population mean of 73.6 kg. Show your working including test statistic and p-value. 
+
+```{r}
+pop_mean = 73.6 #mean of population
+sample_mean = 56.6 #mean of sample
+n = 9 #number of samples
+pop_sd = 14.5 #standard deviation of population
+
+pop_se = pop_sd/sqrt(n) #standard error of population
+
+z = (sample_mean - pop_mean)/pop_se #finding z-score manually
+z #z score
+```
+
+I will be using the z-test to calculate the test statistic, I am using asbio library as shown in book. 
+
+```{r}
+library(asbio) #loading module
+
+test = one.sample.z(null.mu = 73.6, xbar = 56.6, sigma = 14.5, n = 9, alternative = "two.sided") 
+
+test$test #getting the z-score and p-value
+test$alternative #iterating the null hypothesis
+```
+
+P-value of the above z-test statistic is ~ 0.00044.
+
+```{r}
+test$confidence$ci;test$confidence$ends #confidence intervals
+```
+```{r}
+alpha = 0.05
+z.half.alpha = qnorm(1 - alpha/2)
+c(-z.half.alpha, z.half.alpha)
+```
+
+
+
+### b) Interpret your p-value.
+
+The null hypothesis that the mean weight of this sample of patients is equal to the population mean of 73.6 kg is rejected based on the above one-sample z-test, because the p-value is 0.0004 which is way below the optimum given value of 0.05 meaning we can reject the null hypothesis and accept the alternate hypothesis that the mean weight of this sample of patients is not equal to the population mean of 73.6 kg.
+
+```{r, eval=FALSE}
+
+```
+
+
+## 4) A prenatal test for Down syndrome (DS) has a sensitivity i.e. Pr(diagnosed as DS| has disease) = 0.75, and a false positive rate of 0.045. If the probability of DS in the community is 0.0007, what is the probability of DS in a given pregnancy, given a positive test result? (Show your work) (15 pts)
+
+P{TDS+|DS+} = 0.75 = specificity #probabilty of tested +ve for DS given the patient has DS
+
+P{TDS+|DS-} = 0.045 = FPR #probabilty of tested +ve for DS given the patient does not have DS
+
+P{TDS+} = P{TDS+|DS+} + P{TDS+|DS-} = 0.795 #probabilty of tested +ve for DS 
+
+P{DS+} = 0.0007 #probabilty of having DS
+
+P{DS-} = 1 - P{DS+} = 1-0.0007 = 0.9993 #probaility that does not have DS
+
+P{DS+|TDS+} = (P{TDS+|DS+} * P{DS+}) / (P{TDS+|DS+} * P{DS+}) + (P{TDS+|DS-} * P{DS-}) #Bayes Theorem rule
+
+          = (0.75)X(0.0007)/((0.75)X(0.0007) + (0.045)X(0.9993))
+          
+          = 0.01154011
+
+The probability of DS in a given pregnancy, given a positive test result is 0.0115 .
+```{r, eval=FALSE}
+
+
+```
+
+## 5) Researchers measured LDL cholesterol levels in mg/dL between groups of patients with (15 patients) and without (13 patients) a family history of heart disease. The mean LDL in the group with a history of heart disease was 220.2 with standard deviation 40.0, and the mean LDL was 180.3 with standard deviation of 38.5 in the other group (20 pts)
+
+### a) State the null hypothesis of this research.
+
+The null hypothesis is that there should not be any difference in means of LDL levels between patients with heart disease and without heart disease. 
+
+```{r, eval=FALSE}
+
+The null hypothesis is that there should not be any difference in means of LDL levels between patients with heart disease and without heart disease. 
+
+```
+
+### b) What parametric test could you use and what are the assumptions of this test?
+
+We could use an Unpaired t-test because there are two different samples one with heart disease and another without heart disease, so data is not obtained from same individuals meaning two groups so definitely unpaired t-test.I will use the Welch t-test because if I figure out the variance from given standard deviation and take the ratio of variance between 2 groups, its not equal so I cannot use the Pooled t-test.
+
+Assumptions:
+1. The parent distributions underlying the treatments are normally distributed.
+2. The observations are independent.
+3. The variance of two groups are not same.
+
+```{r, eval=FALSE}
+We could use an Unpaired t-test because there are two different samples one with heart disease and another without heart disease, so data is not obtained from same individuals meaning two groups so definitely unpaired t-test.I will use
+
+Assumptions:
+  
+```
+
+### c) What could you do if the data did not meet the assumptions?
+
+If the assumptions are not met as said above, so if the data is not normally distributed I would usually have to transform the data in **log scale to normalize the data**. And if the variances of the two groups were same, we have to use the **Pooled t-test** because we usually select that when there is no variance.
+
+```{r, eval=FALSE}
+
+
+```
+
+### d) Assume the assumptions are met and test your null hypothesis (show test statistic and calculate a p-value)
+
+Using the Satterthwaite procedure to compute the degrees of freedom (v).
+
+$$ v = \frac{(S^2_x/n_x +S^2_y/n_y)^2}{((S^2_x/n_x)^2/(n_x-1)) + ((S^2_y/n_y)^2/(n_y-1))}$$
+
+$$ v = \frac{(40^2/15+38.5^2/13 )^2}{((40^2/15)^2/(15-1))((38.5^2/13)^2/(13-1))}$$
+
+Calculating it gives v = 25.685 which is approximately 26.
+
+
+The Welch t-test statistic formula I am using:
+
+$$ t^* = \frac{(\overline{X}-\overline{Y})-D_0} {\sqrt{S^2_x/n_x +S^2_y/n_y}} $$
+
+$$ t^* = \frac{(220.2-180.3)-0} {\sqrt{ 40^2/15 + 38.5^2/13  }} $$
+
+Calculating the t-score (t*) above gives 2.68.
+
+```{r}
+2*pt(2.68, df = 25.685, lower.tail = FALSE) #p-value for unpaired Welch t-test
+```
+
+### e) Interpret the results of this analysis.
+
+So the p-value is ~ 0.013 which is way less than the standard value 0.05 meaning our p-value is significant and we can reject the null hypothesis that there should not be any difference in means of LDL levels between patients with heart disease and without heart disease rather accept the alternate hypothesis that there should be difference in means of LDL levels between patients with heart disease and without heart disease.
+
+```{r}
+
+```
+
+### f) Provide a 95% confidence interval for the estimated difference in LDL between the two groups.
+
+
+```{r}
+Diff_mean = (220.2-180.3) #difference of mean
+se_diff = 14.85 #standard error of difference (bottom part of t-statistic above)
+
+Diff_mean + qt(p=0.025, df=25.685)*se_diff #confidence interval 
+
+```
+```{r}
+Diff_mean - qt(p=0.025, df=25.685)*se_diff #confidence interval 
+```
+
+
+
+## 6) Iris.
+
+The iris dataset contains information about 4 traits ( sepal length, sepal width, petal length, and petal width for iris ) from 50 flowers, from 3 different species ( *setosa*, *versicolor*, *virginica* ). (30pts)
+
+### a)	Create four boxplots, one for each trait. In your graph, the x-axis is the species and the measurements are on the y-axis.
+
+```{r}
+#iris
+```
+
+```{r, fig.height=5}
+
+boxplot(iris[,1]~iris[,5], ylab = "Sepal.Length", xlab = "Species") #boxplot of sepal length based on species
+```
+
+```{r,fig.height=5}
+boxplot(iris[,2]~iris[,5], ylab = "Sepal.Width", xlab = "Species") #boxplot of sepal width based on species
+```
+
+```{r,fig.height=5}
+boxplot(iris[,3]~iris[,5], ylab = "Petal.Length", xlab = "Species") #boxplot of petal length based on species
+```
+
+```{r,fig.height=5}
+boxplot(iris[,4]~iris[,5], ylab = "Petal.Width", xlab = "Species") #boxplot of petal width based on species
+```
+
+### b)	Which of the 4 traits is the **_least_** useful in distinguishing all three species? Explain how you know. 
+
+Based on the above boxplots, I think sepal.width is least useful because it is not well differentiated and whiskers are almost on kind same area, also the IQR tends to fall on the same line for Versicolor and virginica for Sepal Width so its hard to differentiate.
+
+```{r, eval=FALSE}
+Based on the above boxplots, I think sepal.width is least useful because it is not well differentiated and whiskers are almost on kind same area, also the IQR tends to fall on the same line for Versicolor and virginica for Sepal Width so its hard to differentiate.
+```
+
+### c) Assuming your data is normally distributed and the variances are equal, perform a statistical test on all three pairwise species comparisons to determine if the trait measurent you have specified in part b can be used to distinguish one species from another. It will be much easier if you first subset the data frame so you are working with just two species at a time.
+
+
+```{r}
+iris_df = iris #iris df
+
+setosa_df = iris_df[iris_df$Species == "setosa",] #subsetting the main df for setosa
+versicolor_df = iris_df[iris_df$Species == "versicolor",]#subsetting the main df for versicolor
+virginica_df = iris_df[iris_df$Species == "virginica",]#subsetting the main df for virginica
+```
+
+```{r}
+#t-test for sepal width b/w setosa & versicolor
+setosa_vs_versicolor_sepalwidth = t.test(x=setosa_df$Sepal.Width, y=versicolor_df$Sepal.Width)
+setosa_vs_versicolor_sepalwidth
+```
+
+```{r}
+#t-test for sepal width b/w setosa & virginica
+setosa_vs_virginica_sepalwidth = t.test(x=setosa_df$Sepal.Width, y=virginica_df$Sepal.Width)
+setosa_vs_virginica_sepalwidth
+```
+
+```{r}
+#t-test for sepal width b/w versicolor & virginica
+versicolor_vs_virginica_sepalwidth = t.test(x=versicolor_df$Sepal.Width, y=virginica_df$Sepal.Width)
+versicolor_vs_virginica_sepalwidth
+```
+
+Based on the null hypothesis in this case we can use sepal width to differentiate between species, but in the above we see p-value for each of them is way less than the optimum given value of 0.05 meaning our data is significant and we can reject the null hypothesis that it sepal width is not possible to differentiate between species.
+
+### d)	Create a new dataframe that contains only **first 10 flowers** from each species, call it **iris_subset**. This data.frame should only have 30 observations ( flowers ).
+
+```{r}
+setosa_df = iris_df[iris_df$Species == "setosa",] #subsetting the main df for setosa
+versicolor_df = iris_df[iris_df$Species == "versicolor",]#subsetting the main df for versicolor
+virginica_df = iris_df[iris_df$Species == "virginica",]#subsetting the main df for virginica
+
+setosa_head = head(setosa_df, 10) #getting first 10 rows from subsetted setosa
+versicolor_head = head(versicolor_df, 10) #getting first 10 rows from subsetted versicolor
+virginica_head = head(virginica_df, 10) #getting first 10 rows from subsetted virginica
+
+iris_1 = rbind(setosa_head, versicolor_head) #joining by rows setosa & versicolor
+
+iris_subset = rbind(iris_1, virginica_head) #joining all first 10 rows and save in iris_subset
+```
+
+
+### e) Perform the same statistical test as part c. Compare the p-value from part c with the result in part e. Why is it different ?
+
+```{r}
+setosa_df_filtered = iris_subset[iris_subset$Species == "setosa",] #subsetting the main df for setosa
+versicolor_df_filtered = iris_subset[iris_subset$Species == "versicolor",]#subsetting the main df for versicolor
+virginica_df_filtered = iris_subset[iris_subset$Species == "virginica",]#subsetting the main df for virginica
+
+```
+
+```{r}
+#t-test for sepal width b/w setosa & versicolor filtered
+setosa_vs_versicolor_sepalwidth_filt = t.test(x=setosa_df_filtered$Sepal.Width, y=versicolor_df_filtered$Sepal.Width)
+setosa_vs_versicolor_sepalwidth_filt
+```
+
+```{r}
+#t-test for sepal width b/w setosa & virginica filtered
+setosa_vs_virginica_sepalwidth_filt = t.test(x=setosa_df_filtered$Sepal.Width, y=virginica_df_filtered$Sepal.Width)
+setosa_vs_virginica_sepalwidth_filt
+```
+
+```{r}
+#t-test for sepal width b/w versicolor & virginica filtered
+versicolor_vs_virginica_sepalwidth_filt = t.test(x=versicolor_df_filtered$Sepal.Width, y=virginica_df_filtered$Sepal.Width)
+versicolor_vs_virginica_sepalwidth_filt
+```
+
+part c data:
+setosa & versicolor : p-value = 2.484e-15
+setosa & virginica  : p-value = 4.571e-09
+versicolor & virginica : p-value = 0.001819
+
+part e data:
+setosa & versicolor : p-value = 0.007163
+setosa & virginica  : p-value = 0.01958
+versicolor & virginica : p-value = 0.6495
+
+P-values are much higher in part e than in part c, this could be because our sample count is low compared to before which is 50 for each group, so there could be less variance in part e than part c, which could be leading the issue.
+
+### f) Using the original iris dataset, perform a shuffle test to determine the probability of getting the absolute value of the observed difference in the means, or greater. Make sure you shuffle atleast 10,000 times. 
+
+```{r}
+library(permute)
+#transform(df, column_name = sample(column_name))
+
+```
+```{r}
+#expgroup = factor(rep(c("setosa","versicolor","virginica"),each=50))
+#expgroup
+
+#species_mean = tapply(iris$Sepal.Width, expgroup, mean)
+
+#species_mean
+
+#sample_diff = tapply(sample(iris$Sepal.Width, length(iris$Sepal.Width), replace=F), expgroup,mean)
+```
+
+
+```{r}
+#iris_shuffle = numeric()
+
+#for (i in 1:10000) {
+  
+  #iris_shuffle[i] = abs(diff(tapply(sample(iris$Sepal.Width, length(iris$Sepal.Width), replace=F), expgroup,mean)))
+#}
+```
+```{r}
+#iris_shuffle
+```
+
+
+I could not test, the above code because my computer is crashing fully and shutting down Rstudio, also it does not let me knit it, I think I am doing something wrong but could not figure it out. I tried my level best for this part. Sorry.
+
+
