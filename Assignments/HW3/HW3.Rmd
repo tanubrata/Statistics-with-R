@@ -1,0 +1,173 @@
+---
+title: "Hw3"
+author: "Tanubrata Dey"
+date: "10/9/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+**Partner: Jake Lustig** (we discussed our homework but we did it individually, please grade individually based on submission, Thank you.)
+
+
+**Q1. A herd of mountain goats is believed to contain 30 males and 20 females. If, for  a single random capture, a male or female is equally easy to capture, what is the probability of capturing 5 females and 1 male in six attempts? Use R to calculate  probabilities**  
+
+    With replacement  
+    Without replacement.
+    
+```{r}
+dbinom(5,6,0.4) #using dbinom since it is with replacement
+
+```
+The probability of capturing 5 females and 1 male in six attempts with replacement is 0.0368.
+
+```{r}
+
+dhyper(x=5, k = 6, m = 20, n=30) #using dhyper since it is without replacement
+
+```
+The probability of capturing 5 females and 1 male in six attempts without replacement is 0.0292 .
+
+---
+
+**Q2. Assume that the number of sightings for bald eagles (Haliaeetus leucocephalus) at a  site over a 4-week period is Poisson distributed (temporally random) with a mean  λ= 10. What is the probability of having 15 sightings over a 4-week period?**
+
+```{r}
+dpois(x = 15, lambda = 10, log = FALSE) #using dpois since its asking the probability of exactly 15 sightings and it is Poisson distributed
+```
+The probability of having 15 sightings over a 4-week period is 0.0347 .
+
+---
+
+**Q3. Let X be a discrete random variable with the pdf f(x) = x/8 if x = 1, 2, or 5, and  f(x) = 0; otherwise, find**  
+
+    a. E(X)  
+    b. Var(X)  
+    c. E(2X + 3)
+    
+```
+    a. E(X) =∑x f(x) #expected value of X formula
+            = 1(1/8) + 2(2/8) + 5(5/8) + 0(0/8) #inputting the values in the formula
+            = 1/8 + 1/2 + 25/8 + 0
+            = 15/4
+            = 3.75 #output for the function
+            
+    b. 
+    
+       E(X^2) =∑x^2 * f(x)
+             = (1^2) * (1/8) + (2^2) * (2/8) + (5^2) * (5/8) + (0^2) * (0/8)
+             = 1 * (1/8) + 4 * (1/4) + 25 * (5/8) + 0
+             = 16.75
+             
+       Var(X) = E(X^2) - E(X)^2 #calculating variance manually
+              = 16.75 - (3.75)^2 #inputting the values
+              = 2.6875 #output for variance of X
+              
+    c.
+    
+       E(2X + 3) = ∑(2x+3) * f(x) #defined formula for expected value of E(2X+3)
+                 = (2*1+3) * (1/8) + (2*2+3) * (2/8) + (2*5+3) * (5/8) + (2*0+3) * (0/8) #inputting the values
+                 = (5)*(1/8) + (7)*(2/8) + (13)*(5/8) + 0
+                 = 21/2 = 10.5 #output for the function  E(2X + 3)
+    
+```
+
+The expected value E(X) is 3.75 .
+The Variance for Var(X) is 2.6875 .
+The expected value E(2X+3) is 10.5 .
+
+---
+
+**Q4. Medium ground finch (Geospiza fortis) population numbers in the Galapagos vary enormously from year to year since their reproduction is strongly tied to precipitation and the region is strongly affected by El Niño and La Niña climatic oscillations (Gibbs and Grant 1987). Here are G. fortis counts on Daphne Major Island  from 1976 to 1984:**  
+
+finch <- c(1220, 400, 380, 298, 280, 200, 297, 280, 1250)  
+
+    Calculate the arithmetic, geometric, and harmonic means using any R function for calculations. 
+    Justify the use of the harmonic mean.  
+    Calculate the sample standard deviation, variance, coefficient of variation, and interquartile range.
+    
+```{r}
+library(asbio) #using the asbio function discussed in book for some functions
+finch <- c(1220, 400, 380, 298, 280, 200, 297, 280, 1250)
+
+#arithmatic mean of finch data
+mean(finch)
+
+#geometric mean of finch data
+G.mean(finch) 
+
+#harmonic mean of finch data
+H.mean(finch)
+
+```
+
+The arithmatic mean is 511.6667
+The geometric mean is 409.2012
+The harmonic mean is 351.3317
+
+Justify the use of the harmonic mean.
+
+The population number for Medium ground finch varies widely from year to year due to the affect by El Niño and La Niña climatic oscillations and since their reproduction is strongly tied to the precipitation. Since their population number tends to oscillate back and forth, this justifies the use of harmonic mean.
+   
+```{r}
+#sample standard deviation of finch data
+sd(finch)
+
+#variance of finch data
+var(finch)
+
+#coefficient of variation of finch data
+sd(finch)/mean(finch)
+
+#interquartile range of finch data
+IQR(finch)
+```
+
+The standard deviation is 414.2596
+The variance is 171611
+The coefficient of variation is 0.8096
+The IQR or interquartile range of the given data is 120.
+
+---   
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
