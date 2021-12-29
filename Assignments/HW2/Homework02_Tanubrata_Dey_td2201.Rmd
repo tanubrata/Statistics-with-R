@@ -1,0 +1,305 @@
+---
+title: "Homework02"
+date: "9/24/2021"
+---
+
+**Name: Tanubrata Dey**
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+## Question 1) Address the following questions. \
+### a. \
+**Draw a Venn diagram representing P(A) = 0.5, P(B) = 0.5, $P(A∩B)$ = 0.25.** \
+```{r}
+library(VennDiagram)
+```
+
+```{r}
+grid.newpage()
+draw.pairwise.venn(area1 = 0.5, area2=0.5, cross.area=0.25, fill = c("orange", "pink")) #Drawing Venn Diagram for the above question
+```
+
+### b. Are A and B disjoint? \
+
+A and B are not disjoint because P(A∩B) > 0.
+
+### c. Are A and B independent?  \
+
+A and B are independent because the probability of happening A does not affect the probability of happening B.
+
+### d. \
+**Let P(A) = 0.5, P(B) = 0.5, and let $P(A∩B)≠0$. Can $P(A∩B)$ conceivably  equal a probability other than 0.25? If so draw some. How many other legitimate possibilities are there?** \
+
+```{r}
+grid.newpage()
+draw.pairwise.venn(area1 = 0.5, area2=0.5, cross.area=0.09, fill = c("red", "blue")) #checking some venn diagrams
+```
+
+```{r}
+grid.newpage()
+draw.pairwise.venn(area1 = 0.5, area2=0.5, cross.area=0.40, fill = c("yellow", "magenta")) #checking some venn diagrams
+```
+
+```{r}
+grid.newpage()
+draw.pairwise.venn(area1 = 0.5, area2=0.5, cross.area=0.48, fill = c("darkblue", "green")) #checking some venn diagrams
+```
+
+So the cross.area can be any numbers below 0.5 .
+
+### e. What does this say about the rarity of independence?  \
+
+It seems to be extremely rare because based on the above solutions the probability P(A∩B) always remains same regardless of the the order it is P(A∩B)=P(B∩A)=0.25, this could be because the probability of happening A does not interfere with happening probability of B. Also based on the formula P(A∩B) = P(A).P(B), there could be many ways, maybe infinite, which follows P(A∩B)>0 but this P(A∩B)=P(A).P(B) could have only one single occurence, proving the rarity of independence.
+
+## Qusetion 2) \
+
+While varying with season, the approximate litter size for brown spiny field mice (Mus plantythrix) on dry land sites in India is approximately four (Raj 1994). List all the possible outcomes in terms of male and female offspring for this litter size (order matters). Assume there is no possibility of identical twins.\
+
+### a. List all the possible outcomes in terms of male and female offspring for this litter size (order matters).\
+
+M = male ; F = Female : 2 possible outcomes but 4 litters
+
+1 Male 3 Females:
+MFFF; FMFF; FFMF; FFFM; 
+
+1 Female 3 Males:
+FMMM; MFMM; MMFM; MMMF;
+
+2 Females 2 Males:
+FFMM; MMFF; MFMF; FMFM
+MFFM; FMMF; 
+
+All Males:
+MMMM; 
+
+All Females:
+FFFF;
+
+### b. How many outcomes are possible? How did you mathematically verify this?\
+
+2 possibilities since either Male or Female but there are 4 litters, so outcomes possible are:
+
+
+2 ^ 4 = 2 X 2 X 2 X 2 = 16 different possibilities
+
+2! x 2! x 2! x 2!
+
+### c. What is the probability of each outcome?\
+
+Since there possibilty of either Male or Female but 16 possibilities because of 4 litters, so probabilty for each outcome is:
+
+(1/2)^4 = 1/16
+
+### d. What is the probability of getting three males in a litter of three?\
+
+Probability of 3 males "MMM" in a litter of 3 is:
+
+(1/2)^3 = 1/8 of getting 3 males in a litter of 3.
+
+### e. Given your data what is the probability of getting three females in a litter of four?\
+
+Probability of getting 3 females in a litter of 4 is:
+
+4/16 = 1/4 probabilty of getting 3 females in a litter of 4.
+
+### f. What is the probability of getting at least one female in a litter of four?\
+
+To get atleast 1 female in a litter of 4 the possibilities would be:
+
+15/16 probabilty of getting atleast 1 female in a litter of 4.
+
+### g. What is the probability of getting no females?\
+
+1/16 is the probability of getting no females in a litter of 4 because there is only one instance "MMMM" where Female is not possible.
+
+## Qusetion 3) \
+
+Recent reports indicate that 57% of college students are women. In 2008, the  American Heart Association reports that 23.1% of men and 18.3% of women are  smokers. If we can assume that college attendance and smoking are independent  (i.e., 23.1% of college men and 18.3% of college women are smokers), then\
+
+### a. What is the probability that a college student observed smoking is a man?\
+
+P(man|smoking) = P(smoking|man) * P(man)/ P(smoking)
+               = ((0.231) * (0.43) )/ ((0.23*0.43) + (.183*.570))
+               = 0.488
+
+```{r}
+#P(man|smoking) = P(smoking|man) * P(man)/ P(smoking)
+
+((0.231) * (0.43) )/ ((0.231*0.43) + (.183*.570)) #doing the calculations for the above question in R
+
+
+```
+
+The probability that a college student observed smoking is a man is 0.487 .
+
+### b. What is Ω(smoking|man)? \
+
+Ω = P(man)/1-P(man)
+
+  = (0.231*0.43)/1-(0.231*0.43)
+  
+```{r}
+#Ω = P(man)/1-P(man)
+
+(0.231)/(1-(0.231)) #calculating the odds.
+
+```
+
+Probability of odds of smoking given man is 0.300 .
+
+## Question 4)\
+
+Rao et al. (1998) reported on the utility of using computerized tomography (CT)  as a diagnostic test for patients with clinically suspected appendicitis. Traditional  clinical methods of diagnosis, and diagnosis using the aid of CT were used on  100 patients. Whether patients actually had appendicitis was determined later by  examining the appendix following an appendectomy.
+
+- Here are the clinical results.  
+
+Presence of Appendicitis Clinical Diagnosis | $APP^+$ | $APP^-$
+------------- | ------------- | -------------
+Definite appendicitis (DA) | 18| 5  
+Probably or equivocally appendicitis (PA) | 28 | 33  
+Probably not, or definitely no appendicitis (NA) | 7 | 9  
+Total | 53 | 47 
+
+- Here are the CT-aided results.  
+
+Presence of Appendicitis  CT-Aided Diagnosis | $APP^+$ | $APP^-$  
+------------- | ------------- | -------------
+Definite appendicitis (DA) | 50 | 1  
+Probably or equivocally appendicitis (PA) | 2 | 0  
+Probably not, or definitely no appendicitis (NA) | 1 | 46  
+Total | 53 | 47  
+
+The 1996 probability of appendicitis among U.S. citizens ($APP^+$) was approximately 0.00108 (Ott and Longnecker 2004).  
+
+### a. \
+**Determine $P(DA|APP^+)$, $P(DA|APP^−)$, $P(NA|APP^+)$, and $P(NA|APP^−)$ for  clinical diagnosis method and the TC method (this does not require Bayes  theorem).**  \
+ 
+ Clinical Diagnosis:
+ 
+P(DA|APP^+) = 18/53
+P(DA|APP^−) = 5/47
+P(NA|APP^+) = 7/53
+P(NA|APP^−) = 9/47
+
+
+
+CT-method:
+P(DA|APP^+) = 50/53
+P(DA|APP^−) = 1/47
+P(NA|APP^+) = 1/53
+P(NA|APP^−) = 46/47
+
+### b. \
+**Find the probability that a patient did have appendicitis ($APP^+$) given that the  determination was definite appendicitis (DA). Calculate this for both the clinical diagnosis method and the CT method.**  \
+
+P(APP+|DA) = P(D|APP+)* P(APP+)/P(D)
+           = ((18/53)*(53/100)) / (23/100)
+           = 0.783
+           
+The probability that a patient did have appendicitis given that the determination was definite appendicitis (DA) in clinical diagnosis method is 0.783 .
+
+P(APP+|DA) = P(D|APP+)* P(APP+)/P(D)           
+           = ((50/53)*(53/100))/(51/100)
+           = 0.98
+
+The probability that a patient did have appendicitis given that the determination was definite appendicitis (DA) in CT method is 0.98 .
+
+## Question 5) \
+
+You are working on a mark–recapture study of boreal toads, Bufo boreas.\
+You predict that there is a 40% chance of capturing a marked toad for each of 30 traps that you establish.  \
+
+### a. What is the probability that exactly 20 marked toads will be found in the 30  traps? Calculate this by hand, and confirm your calculation using R.  *hint - use one of the functions for binomial distribution.* \
+
+P(x|n,p) = ((n!)/(x!*(n-x)!)*(p^x)*(1-p)^n-x
+
+        = ((30!)/(20!*(30-20)!)*((0.4^20)*(1-0.4)^(30-20))
+
+```{r}
+(factorial(30))/(factorial(20)*factorial(30-20))*((0.4^20)*(1-0.4)^(30-20)) #doing manually using binomial distribution
+```
+
+Using by hand manually the probability that exactly 20 marked toads will be found in the 30  traps is 0.0019.
+
+
+```{r}
+dbinom(x = 20, size = 30, prob = 0.4) #using dbinom to verify
+```
+
+Using the dbinom() function in R the probability that exactly 20 marked toads will be found in the 30  traps is 0.0019.
+
+### b. What is the probability that up to 20 marked toads will be found? Use R.\
+
+```{r}
+pbinom(q = 20, size = 30, prob = 0.4) #using pbinom because it says upto 20
+```
+
+
+## Question 6) We will confirm our results by using simulation.\
+
+### a. create a vector where 40% of the values are "M" and 60% are "T"\
+
+Total values = 50;
+
+40% of 50 = 20; 
+
+60% of 50 = 30;
+
+
+```{r}
+v1 <- sample(c(rep("M", times=20), rep("T", times=30))) #creating a vector with 40% M and 60% T and then sampling random
+v1 #printing the vector
+```
+
+
+### b. sample this vector for 30 values (with replacement) and count the number of "M"\
+
+```{r}
+v2 <- sample(v1, size = 30, replace = TRUE)  #creating a vector sample using vector v1 of size 30 with replacement
+v3 <- sum(v2 == "M") #counting number of M in v2.
+v2 #printing vector v2
+v3 #printing vector v3
+```
+
+
+### c. Do step b 10,000 times and save the number of "M" for each iteration.\
+
+```{r}
+tot_simulation <- 10000 #assigning value for number of simulations
+
+v1_subset = numeric() #defining a variable as numeric
+
+for (i in 1:tot_simulation) { #for loop to create simulation
+  v1_subset[i] = sum(sample(v1, 30, replace = TRUE) == "M") #creating a vector list containg 10000 iterations of M counts
+}
+```
+
+
+
+### d. Create a histogram of the 10,000 values.\
+
+```{r}
+hist(v1_subset) #histogram of vector list v1_subset
+```
+
+
+### e. What is the expected number of marked toads you would have EXPECTED to catch.\
+
+40% of the values are “M” and sample for 30 values with replacement, so its 40% of 30 = 12
+
+
+```{r}
+(40/100)*30 #40% of 30
+```
+
+
+### f. How many times did you catch exactly 20 marked toads? Is this similar to previous question?\
+
+```{r}
+sum(v1_subset == 20) #counting number of M that is 20 within 10000 iterations
+```
+Its not exactly same but kind of similar to the previous question.
+
