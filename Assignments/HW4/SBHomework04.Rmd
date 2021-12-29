@@ -1,0 +1,191 @@
+---
+title: "SB Anova homework Key"
+author: "Manpreet S. Katari"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### Tanubrata Dey
+
+The datasets are available in R. Simply type the name of the dataset and you will be able to access it.
+
+
+# CO2. 
+
+The `CO2` object contains information such as Plant ID, Origin, whether they were chilled, and how much CO2 was taken up when exposed to a specific concentration of CO2. 
+
+## 1) Linear Regression
+
+We are going to create a regression model of the **chilled** data from **Quebec** so that we can predict the **uptake** given the **conc** of CO2.   
+
+### Subset the data
+
+Create a subset of **CO2** with just the chilled treatment and of type Quebec. Call this **chilledQuebec**.
+
+```{r}
+chilledQuebec = subset(CO2, Type == "Quebec" & Treatment == "chilled")
+head(chilledQuebec)
+```
+
+### Create a linear model
+
+Create a linear model using the **chilledQuebec** where we are predicting uptake in response to conc of CO2. Save the model as **chilledQuebecLM**
+
+```{r}
+str(chilledQuebec)
+```
+
+
+```{r}
+chilledQuebecLM = lm(uptake ~ conc, data = chilledQuebec)
+summary(chilledQuebecLM)
+```
+
+
+### plot a line
+
+Create a line plot with conc as the x-axis and the uptake as y-axis. Plot the point AND the linear model
+
+```{r}
+#plot(chilledQuebec$conc, chilledQuebec$uptake)
+#abline(lm(uptake ~ conc, data = chilledQuebec))
+plot(chilledQuebecLM)
+```
+
+```{r}
+library(ggplot2)
+
+ggplot(chilledQuebec, aes(x = conc, y = uptake)) +
+  labs(x = "Concentration", y = "Uptake") +
+  theme_minimal() +
+  geom_point(color = "red") +
+  geom_smooth(method = "loess", se=FALSE, col="orange") + 
+  stat_smooth(method = "lm", col = "red")
+```
+
+
+### Interpetation
+
+Is this a good fit? Is the relationship linear? Explain your answer.
+
+So if you notice the above ggplot, it shows that the linear model plot in red is a straight line and the orange line in that plot is a bit curved and is more aligned with the points but the red lm line is straight but the points kind of doesn't align much as they do in curved plot so not a good fit in red line but looks a better fit for the orange curve. Also if you check the p-value of the model, it pretty low around 0.0001 which might point the idea that the model is good. 
+Now if you check the residual vs fitted plot above, generally if it is a straight line mostly horizontal, then it is a linear one, but in this case its curved meaning the relationship is non-linear. 
+
+```
+
+```
+
+### Correlation
+
+Calculate the pearson and spearman correlation for uptake and conc from in the chilledQuebec dataset. Use the **cor.test()** function.
+Which of the two has a higher *rho* value? How does this align with your observation from the previous question?
+
+```{r}
+cor.test(x = chilledQuebec$conc, y = chilledQuebec$uptake, method = "spearman", exact = FALSE)
+```
+
+```{r}
+cor.test(x = chilledQuebec$conc, y = chilledQuebec$uptake, method = "pearson", exact = FALSE)
+```
+
+So as we know Spearman correlation is used to evaluate the monotonic relationship between two variables, so the variables tend to change together, though not in a constant rate. Whereas Pearson correlation is used to evaluate linear relationship between two variables meaning a change in one variable is associated with a proportional change in the other variable. So based on the rho value, spearman value is higher than the pearson because our data is not linear as we saw in the first question, so this could be the reason.
+
+## 2)	ANOVA 
+
+### Subset the data
+
+Generally at concentration level 1000, the plant has taken up as much as it can so for this part we will only be interested in the amount of uptake at concentration level 1000.
+
+Create a new dataframe called `CO2_1000` containing only the rows where concentration equals to 1000.
+
+```{r}
+CO2_1000 = subset(CO2, conc == 1000)
+head(CO2_1000)
+```
+
+### Perform Anova
+
+Assuming that the data is from a normal distribution, use BOTH, the lm() and aov() functions, on the **CO2_1000** data to determine whether origin (the column `Type`), `Treatment` (chilled or non-chilled), or their `interaction` influences the amount of CO2 uptake by the plant. 
+
+```
+boxplot(uptake ~ Type + Treatment, data = CO2_1000)
+```
+### TYPE
+
+```{r}
+CO2_1000_lm_type = lm(uptake ~ Type, data = CO2_1000)
+summary(CO2_1000_lm_type)
+```
+
+```{r}
+CO2_1000_aov_type = aov(uptake ~ Type, data = CO2_1000)
+summary(CO2_1000_aov_type)
+```
+
+### Treatment
+
+```{r}
+CO2_1000_lm_treat = lm(uptake ~ Treatment, data = CO2_1000)
+summary(CO2_1000_lm_treat)
+```
+
+```{r}
+CO2_1000_aov_treat = aov(uptake ~ Treatment, data = CO2_1000)
+summary(CO2_1000_aov_treat)
+```
+
+### Type + Treatment
+
+```{r}
+CO2_1000_lm = lm(uptake ~ Type * Treatment, data = CO2_1000)
+summary(CO2_1000_lm)
+```
+
+```{r}
+CO2_1000_aov = aov(uptake ~ Type * Treatment, data = CO2_1000)
+summary(CO2_1000_aov)
+```
+
+
+### Interpratation
+
+Explain the results from both functions and explain why they are different.  
+
+We know that linear model is basically used for experiments that are planned ahead whereas the anova is done literally for experiments that have not been planned. So the results from looking at summary for lm and summary for aov looks different to me. As Professor said during lecture, the null hypothesis of linear modeling is that the slope of the line is 0, whereas the null hypothesis of the anova is that the variance of all of the data is the same as the variance of the individual groups.So basically the starting for linear model is control, whereas in anova there is no start point rather looking at the differences between the groups. If you look at the p-values for each case whether its only "type" or "treatment" or the interaction of type and treatment, both lm and anova give the same p-values in each case, but if you notice lm provides p-values for more specific categories of independent variable whereas in anova it provides for each categorical column.
+
+```
+#
+```
+
+###	Boxplot
+
+Create a boxplot showing the 4 different in the **CO2_1000** data. combinations: 
+
+**Quebec-chilled, Quebec-nonchilled, Mississippi-chilled, Mississippi-nonchilled**
+
+```{r}
+boxplot(uptake ~ Type * Treatment, data = CO2_1000)
+
+```
+
+```{r}
+library(ggplot2)
+CO2_1000$type_treat <- interaction(CO2_1000$Type, CO2_1000$Treatment)
+ggplot(aes(y = uptake, x = type_treat, fill = Type), data = CO2_1000) + geom_boxplot()
+```
+
+
+### Visual Confirmation
+
+Based on the plot, do the results from the significant test in part 2 make sense? Explain.
+
+Comprehending the boxplot above, if you notice Type Quebec with non-chilled Treatment has higher uptake means compared to Type Quebec with chilled Treatment and also type Mississippi with non-chilled Treatment has higher uptake means compared to Type Mississippi with chilled Treatment. Though Quebec-nonchilled has higher uptake than Mississippi-nonchilled but if you notice the chilled treatment is decreasing the uptake. From part 2 the p-value gives us an idea that the data is significant and yes the results make sense. 
+
+```{r}
+
+#
+```
+
