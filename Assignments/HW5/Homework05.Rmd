@@ -1,0 +1,167 @@
+---
+title: "Homework 05"
+Name: "Tanubrata Dey"
+date: "11/14/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### Tanubrata Dey (td2201)
+
+## Part 1: distance and correlation
+
+Load the dataset `state`, and we will use the matrix `state.x77` to answer the following questions.
+
+```{r}
+state = state.x77 #state dataset
+head(state)
+```
+
+
+### Question 1.a Distance: Calculate the Euclidean distance between every two state. Based on the Euclidean distance, which two states are the closest (most similar)? (2 points)
+
+
+```{r}
+state_euclidean = dist(state, method = "euclidean") #euclidean distance matrix
+#state_euclidean = as.data.frame(state_euclidean)
+```
+
+```{r}
+state_euclidean_df <- as.data.frame(as.matrix(state_euclidean)) #converting the distance matrix as a dataframe
+
+#min(state_euclidean_df)
+#write.csv(state_euclidean_df, file = "state_ed.csv")
+```
+
+
+```{r, fig.height=30, fig.width=20}
+plot(hclust(state_euclidean)) #plotting hierarchial clustering for distance matrix
+```
+
+```{r}
+library(tidyverse)
+library(reshape2)
+x = as.matrix(state_euclidean) %>% melt(varnames = c("State_1", "State_2"), value.name = "distance") %>% arrange(distance) %>% filter(distance != 0) %>% filter(row_number()==1) #getting the states with lowest distance value
+
+print(x)
+```
+
+It is hard to get the minimum distance from a big distance matrix, because min() function would not work since diagonal gives 0 for distance between same states, So to verify, I first plot a hierarchial cluster of the states using distance matrix and visually it looks New Hampshire and Vermont to be the closest based on distance. To verify I checked the distance matrix using some tidyverse commands to filter the lowest ditance matrix and I get for **New Hampshire and Vermont** and it gives **559.5688** which is pretty low. To crosscheck I make the distance matrix as an R dataframe and started to look for the lowest value by each column and Vermont and New Hampshire gave the lowest overall, so based on the Euclidean distance, **New Hampshire and Vermont** are the closest.
+
+
+### Question 1.b Correlation: Calculate the correlation between every two variables. Show the correlation matrix. (1 points)
+
+```{r}
+as.data.frame(cor(state, method = "pearson")) #correlation between every two variables of the state dataset
+```
+
+
+### Question 1.c: Interpretation for the correlation matrix. Talk about whether the variables are positive or negative correlated, the correlation is strong or weak. (1 points)
+
+
+
+From the above correlation matrix of the variables, for Murder and Population, there is weak positive correlation because the value is 0.343. For Murder and Income, there is weak negative correlation because the value is -0.230.For Murder and Illiteracy, there is strong positive correlation because the value is 0.702. For Murder and Life expectancy, there is strong negative correlation because the value is -0.780.For Murder and HS Graduate, there is moderate negative correlation because the value is -0.487. For Murder and Frost, there is moderate negative correlation because the value is -0.538. For Murder and Area, there is weak positive correlation because the value is 0.228. 
+
+## Part2: Tidyverse: Use the dataset `GSE124548.raw.fixed.txt` to answer the following questions
+
+### Question 2.a: Create a tibble named `HC` with gene id and all columns that have "HC" in their name
+
+```{r}
+library(readr)
+GSE124548 <- read_delim("GSE124548.raw.fixed.txt", 
+     delim = "\t", escape_double = FALSE, 
+     trim_ws = TRUE) #loading the dataset
+```
+
+```{r}
+library(tidyverse)
+```
+
+```{r}
+HC = GSE124548 %>% select(ID, contains("HC")) #filtering gene id and all columns that have "HC" in their name
+head(HC) #printing few rows of HC
+```
+
+```{r}
+is_tibble(HC) #verify if its tibble
+```
+
+
+### Question 2.b: Create a tibble named `CF` with gene id and all columns that have "Base" in their name
+
+```{r}
+CF = GSE124548 %>% select(ID, contains("Base")) #gene id and all columns that have "Base" in their name
+head(CF) #printing few rows of CF
+```
+
+```{r}
+is_tibble(CF) #verify if its tibble
+```
+
+### Question 2.c: Use tidyverse to calculate the column sums of `CF`. Hint: use `pivot_longer`, `group_by` and `summarise` function. (1 points)
+
+```{r}
+CF_sum = CF %>% pivot_longer(-1, names_to = "samples", values_to = "counts") %>% group_by(samples) %>% summarise(sum(counts)) #calculating the column sums of `CF`
+
+colnames(CF_sum) = c("Samples", "Col_counts") #changing column names
+head(CF_sum) #first few lines of the df
+```
+
+### Question 2.d: Use ggplot2 to create two barplot showing the column sums of all `HC` and all `CF` (2 points)
+
+```{r}
+HC_sum = HC %>% pivot_longer(-1, names_to = "samples", values_to = "counts") %>% group_by(samples) %>% summarise(sum(counts)) #calculating the column sums of `HC`
+
+colnames(HC_sum) = c("Samples", "Col_counts") #changing column names
+head(HC_sum) #first few lines of the df
+```
+
+```{r}
+library(ggplot2)
+library(extrafont)
+```
+
+```{r}
+ggplot() + geom_bar(HC_sum,mapping = aes(x=Samples, y=Col_counts), stat = "identity", color="green4", fill="green1") + theme_minimal() + scale_x_discrete(guide = guide_axis(angle = 90)) + theme_minimal() +
+  ggtitle("HC column sum Plot") + theme(plot.title = element_text(size=20, face="bold", vjust=1, lineheight=0.6))
+#ggplot for HC column sum
+```
+
+```{r}
+ggplot() + geom_bar(CF_sum, mapping = aes(x=Samples, y=Col_counts), stat = "identity", color="darkorange4", fill="darkorange1") + scale_x_discrete(guide = guide_axis(angle = 90)) + theme_minimal() +
+  ggtitle("CF column sum Plot") + theme(plot.title = element_text(size=20, face="bold", vjust=1, lineheight=0.6))
+#ggplot for CF column sum
+```
+
+### Question 2.e: Use tidyverse to calculate the average count for genes in `HC` and `CF`. Hint: use `pivot_longer`, `group_by` and `summarise` function. (2 points)
+
+```{r}
+HC_average = HC %>% pivot_longer(-1, names_to = "samples", values_to = "counts") %>% group_by(ID) %>% summarise(mean(counts)) #calculating the average count for genes in `HC`
+
+colnames(HC_average) = c("Gene_ID", "Avg_gene_counts") #changing column names
+head(HC_average) #first few lines of HC average gene counts
+```
+
+```{r}
+CF_average = CF %>% pivot_longer(!ID, names_to = "samples", values_to = "counts") %>% group_by(ID) %>% summarise(mean(counts)) #calculating the average count for genes in `CF`
+
+colnames(CF_average) = c("Gene_ID", "Avg_gene_counts") #changing column names
+head(CF_average) #first few lines of HC average gene counts
+```
+
+### Question 2.f: Use tidyverse to sort the average count for genes in `HC` and `CF` from  highest to lowest (1 points)
+
+
+```{r}
+HC_average_sorted = HC_average %>% arrange(desc(Avg_gene_counts)) #sorting the average count for genes in `HC`
+head(HC_average_sorted) #first few lines of the sorted average counts
+```
+
+```{r}
+CF_average_sorted = CF_average %>% arrange(desc(Avg_gene_counts)) #sorting the average count for genes in `CF`
+head(CF_average_sorted) #first few lines of the sorted average counts
+```
+
