@@ -1,6 +1,6 @@
 ---
-title: "SB Anova homework Key"
-author: "Manpreet S. Katari"
+title: "Anova homework"
+author: "Tanubrata Dey"
 output: html_document
 ---
 
