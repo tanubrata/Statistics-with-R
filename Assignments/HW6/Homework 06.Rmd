@@ -1,0 +1,224 @@
+---
+title: "Homework 06-PCA_tSNE"
+author: "Tanubrata Dey"
+date: "12/3/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+
+```{r echo=F, eval=F}
+library(GEOquery)
+```
+
+
+```
+Sys.setenv("VROOM_CONNECTION_SIZE"=99999999)
+readr::local_edition(1)
+gse2109 = getGEO("GSE2109")
+```
+
+```
+tissues = gse2109$GSE2109_series_matrix.txt.gz@phenoData@data$source_name_ch1
+samples = rownames(gse2109$GSE2109_series_matrix.txt.gz@phenoData@data)
+expvalues = exprs(gse2109$GSE2109_series_matrix.txt.gz)
+```
+
+```
+write.table(cbind(samples,tissues), "Tissues.txt",
+            row.names = F)
+write.table(expvalues, "ExpressionValues.txt", col.names = NA)
+```
+
+
+The dataset we are using for this homework comes from the Expression project of Oncology. (https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=gse2109)
+The project performed microarray analysis on over 2000 patients with cancer. Samples were taken from many different tissues. There are two goals for this assignment:
+
+1) Identify genes that can help us distinguish the different types of cancer, and
+
+2) Create a PCA and a tSNE plot using these genes to visually determine if we are successful.
+
+To make our analysis easier, we will focus on : Breast, Colon, Kidney, and Lung. 
+
+## Step 0: Load the data
+
+There are two files provided. 
+- The ExpressionValues.txt contains a matrix where each row is a different probe identifier and every column is a different sample. Load this as **expvalues**
+- The Tissues.txt contains the tissue corresponding to the sample name. Load this as **tissues**
+
+```{r}
+library(readr)
+expvalues <- read.csv("~/NYU classes/Fall 2021/BIOL-GA-2030/HW6/ExpressionValues.txt", row.names=1, sep="") #loading expvalues data
+
+tissues <- read.csv("~/NYU classes/Fall 2021/BIOL-GA-2030/HW6/Tissues.txt", sep="") #loading tissues data
+
+```
+
+
+## Step 1: Focus on a few specific tissues
+
+Create a new data frames, call it **select_expvalues** and **select_tissues** to store the new, smaller sets.
+
+```{r}
+library(tidyverse)
+```
+
+
+```{r}
+select_tissues = filter(tissues, tissues == "Breast"| tissues == "Colon" | tissues == "Kidney" | tissues == "Lung") #selecting specific tissues
+```
+
+```
+select_expvalues = select(expvalues, select_tissues$samples %in% colnames(expvalues))
+```
+
+```{r}
+select_expvalues = expvalues %>% select(one_of(dput(as.character(select_tissues$samples)))) #selecting specific expvalues based on select_tissues dataset
+```
+
+## Step 2: Determine differentially expressed genes
+
+We want to identify genes whose expression are not the same in the different tissues we have selected. What statistical test is appropriate here? Explain your answer.
+
+To identify genes that are differentially expressed, we could have used the t-test but the issue is t-test only works when there is 2 different groups to compare but in our case there are 4 (breast, colon, kidney, lung), so t-test cannot be done. For this reason, the best one to choose is ANOVA from where we can get p-values and then by FDR method we can adjust them and filter out the most significant genes based on lower p-values.
+
+
+### Step 3: Perform the statistical test for each gene.
+
+Save the pvalues of the test in a vector call pvalues.
+```{r}
+
+#############################################
+anova3way.mk <- function(expvector, vector1) 
+#############################################
+#
+# INPUT 1: expvector = numerical vector
+#  vector1 is a vector defining the first parameter. 
+
+
+{
+# function is not assuming factors were provided so we just make sure here
+  v1 = factor(vector1)
+ 
+  temp.stats = numeric()
+  
+  # the model below is equivalent to v1 , however here we are explicit
+  temp.lm=lm(expvector ~ v1)
+  
+  #probability of the model can be calculated by retrieving the values for 
+  # performing fstatistics
+  temp.fstat=summary(temp.lm)$fstatistic
+  temp.model.value = pf( temp.fstat[1] , temp.fstat[2] , temp.fstat[3] , lower.tail=F )
+  
+  return(temp.model.value)
+}
+
+
+pvalues = apply(select_expvalues, 1, anova3way.mk, select_tissues$tissues) #getting the p-values for each gene and saving in pvalues
+
+```
+
+```{r}
+head(as.data.frame(pvalues)) #head of the pvalues dataframe
+```
+
+
+
+### Step 4: Adjust for multiple hypothesis testing 
+
+Use the p.adjust function to correct for multiple hypothesis testing uing the FDR method. Save these adjusted values as **adjpvalues**.
+
+
+```{r}
+adjpvalues = p.adjust(pvalues, method="fdr") #adjusting the pvalues using fdr technique
+
+```
+
+```{r}
+head(as.data.frame(adjpvalues)) #viewing the first few lines of adjusted pvalues
+```
+
+
+## Step 5: Take the expression values of the 200 genes with lowest adjusted pvalue. Save this as **sig_values**
+
+```{r}
+
+pvalues_sorted = sort(adjpvalues, decreasing = F) #sprting the adjusted values in ascending order
+
+sig_values = select_expvalues[names(pvalues_sorted)[1:200],] #getting the first 200 significant genes
+
+dim(sig_values) #checking the dimension of significant values
+
+```
+
+
+
+## Step 6: Perform PCA using sig_values
+
+Draw the PCA plot. Don't forget, you can use the tissues column in the tissues data frame to add color so you can see how they have separated.
+
+```{r}
+data.prcomp = prcomp(t(sig_values), scale=TRUE, center=TRUE) #pca on significan genes
+
+# your eigenvector is
+head(data.prcomp$sdev) 
+
+```
+
+```{r}
+data.prcomp$rotation[1:6,1:6] #rotating the first 6 PCA
+data.prcomp$x[1:6.1:6] #data for first 6 PCA
+```
+
+```{r}
+plot(data.prcomp) #plotting histogram of first 6 PCA
+```
+
+```{r}
+#table of variance - shows proportion of variance
+summary(data.prcomp)
+```
+
+```{r}
+library(dplyr)
+library(ggplot2)
+coords2draw = as.data.frame(data.prcomp$x) #making a dataframe of all PCA values
+coords2draw = cbind(coords2draw, select_tissues$tissues) #appending the tissues column in this df
+
+ggplot(coords2draw) +
+  geom_point(mapping=aes(x = PC1, y= PC2, col = select_tissues$tissues)) #plotting PCA cluster using ggplot
+```
+
+
+## Step 7: Perform a tSNE
+
+Use the tsne function in the M3C package to create a tSNE plot. Use a dotsize of 2 to make the figure easier to see.
+
+```{r}
+library(BiocManager)
+BiocManager::install("M3C") 
+library(M3C) #loading module
+```
+
+
+
+```{r}
+
+
+tsne(select_expvalues, labels=select_tissues$tissues, 
+     perplex = 15, dotsize = 2) #running tSNE with dotsize 2 om the select_expvalues data and labeling based on groups
+```
+
+
+
+## Step 8: What have you learned?
+
+Explain whether we were able to use our top 200 genes to separate the data based on the tissue source. Compare how useful PCA was versus tSNE.
+
+Based on PCA and tSNE plots, we could see they are somehow distributed into clusters based on the coloring by the factors: breast, colon, kidney, Lung. Now comparing to PCA and tSNE, I think tSNE worked much better than PCA. Though both are dimensionality reduction methods, but tSNE is a non-linear dimensionality reduction technique whereas PCA is a linear Dimensionality reduction technique and PCA tries to preserve the global structure of the data whereas its opposite for tSNE which preserves local structure of data. The best part for tSNE is you can tune hyperparameters which is not actually possible in PCA and PCA also is not good at taking care of outliers but tSNE can handle outliers. So if you notice the plots, PCA shows separation by colors, but they actually well differentiated rather it seemed to be together whereas in tSNE, it seemed to have separate clusters though I see some data mixed but not like PCA. So I would say tSNE is much better and efficient than tSNE.
+
+
